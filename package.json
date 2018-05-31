@@ -1,0 +1,32 @@
+{
+  "name": "serverproject",
+  "version": "1.0.0",
+  "description": "",
+  "main": "DButils.js",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "jsonwebtoken": "^8.2.1",
+    "morgan": "^1.9.0",
+    "node-datetime": "^2.0.6",
+    "nodemon": "^1.17.4",
+    "tedious": "^2.6.1",
+    "tedious-connection-pool": "^1.0.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yarhazut/yarhazut.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yarhazut/yarhazut/issues"
+  },
+  "homepage": "https://github.com/yarhazut/yarhazut#readme"
+}
