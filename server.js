@@ -63,5 +63,7 @@ app.use('/reg', function (req, res, next) {
 
 })
 
+
+
 app.use('/reg/poi', poi);
 

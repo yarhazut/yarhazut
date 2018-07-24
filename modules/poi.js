@@ -3,6 +3,7 @@ var router= express.Router();
 var DButilsAzure = require('../DButils');
 var jwt = require('jsonwebtoken');
 var dateTime = require('node-datetime');
+var superSecret= "guythequeen";
 
 
 // get poi
@@ -170,7 +171,7 @@ var formatted = dt.format('Y-m-d H:M:S');
 
 
 //get favorites
-router.get('/getFavorites', function(req,res) {///////////////////////toFix-BUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/*router.get('/getFavorites', function(req,res) {///////////////////////toFix-BUG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     var token = req.body.token || req.query.token || req.headers['x-access-token'];
     var decoded = jwt.decode(token, {complete: true});
      req.decoded= decoded;
@@ -202,12 +203,32 @@ router.get('/getFavorites', function(req,res) {///////////////////////toFix-BUG!
             res.send(err);
         })
      }
-        //res.send(ans)
+        //res.send(response)
     }).catch(function(err){
         res.send(err);
     })
-    });
+    });*/
     
+
+
+    router.get('/getFavorites', function(req,res) {
+        var token = req.body.token || req.query.token || req.headers['x-access-token'];
+        var decoded = jwt.decode(token, {complete: true});
+        req.decoded= decoded;
+        var username= decoded.payload.username;
+        DButilsAzure.execQuery("select * from poi join favorites on poi.name= favorites.poi where username='" +username + "'").then(function(response){
+            res.send(response);
+        }).catch(function(err){
+            res.send(err);
+        })
+        
+    });
+
+
+
+
+
+
 
 
 router.post('/saveFavorites', function(req,res) {
@@ -241,35 +262,51 @@ router.get('/getLastSaved', function(req,res) {
      req.decoded= decoded;
     var username= decoded.payload.username;
     var ans = [];
-    var change= false;
-    DButilsAzure.execQuery("select poi from favorites where username='" +username + "' order by date desc").then(function(response){
-     ans[0]=response[0].poi;
-     ans[1]=response[1].poi;   
-       var i;
-     for( i=0; i<2; i++)
-     {
-        DButilsAzure.execQuery("select * from poi where name='" +ans[i] + "'").then(function(response){
-           if(i==2)
-           {
-                i=0;
-               change=true;
-           }
-             
-            ans[i]=response[0];
-            i++;
-            if (i==2 && change)
-                res.send(ans)
-        }).catch(function(err){
-            res.send(err);
-        })
-     }
-        //res.send(ans);
+    DButilsAzure.execQuery("select * from poi join favorites on poi.name = favorites.poi  where username='" +username + "' order by date desc").then(function(response){
+     if(response.length>0)   
+         ans[0]=response[0];
+     if(response.length>1)   
+         ans[1]=response[1];   
+        res.send(ans);
     }).catch(function(err){
         res.send(err);
     })
     });
 
 
+
+    router.get('/checkToken', function(req,res) {
+        var token = req.body.token || req.query.token || req.headers['x-access-token'];
+    
+        // decode token
+        if (token) {
+            // verifies secret and checks exp
+            jwt.verify(token, superSecret, function (err, decoded) {
+                if (err) {
+                    return res.json({ success: false, message: 'Failed to authenticate token.' });
+                } else {
+                    // if everything is good, save to request for use in other routes
+                    // get the decoded payload and header
+                    var decoded = jwt.decode(token, {complete: true});
+                    req.decoded= decoded;
+                    return res.status(200).send({
+                        success: true,
+                        message: 'token provided.'
+                    });
+                }
+            });
+    
+        } 
+        else 
+        {
+            // if there is no token
+            // return an error
+            return res.status(403).send({
+                success: false,
+                message: 'No token provided.'
+            });
+        }
+        });
 
 
  
